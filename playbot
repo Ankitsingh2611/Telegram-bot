@@ -1,0 +1,45 @@
+import telebot
+import os
+from PIL import Image, ImageDraw
+
+# Set your Telegram bot token as an environment variable
+TOKEN = os.environ.get('6249215249:AAGnR6Yp_GskgJB65FPbVLbyZoNC6iKUyhU')
+
+# Create a new bot instance
+bot = telebot.TeleBot(TOKEN)
+
+# Define a command to handle the '/start' command
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "Hello! I'm an AI Telegram bot. How can I assist you today?")
+
+# Define a command to handle the '/help' command
+@bot.message_handler(commands=['help'])
+def send_help(message):
+    bot.reply_to(message, "Here are the commands I support:\n/start - Start the bot\n/help - Show this help message\n/draw - Draw a square on a blank image")
+
+# Define a command to handle the '/draw' command
+@bot.message_handler(commands=['draw'])
+def draw_square(message):
+    # Create a blank image with a white background
+    image = Image.new('RGB', (200, 200), (255, 255, 255))
+    
+    # Draw a red square on the image
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((50, 50, 150, 150), fill=(255, 0, 0))
+    
+    # Save the image
+    image.save('square.png')
+    
+    # Send the image to the user
+    with open('square.png', 'rb') as f:
+        bot.send_photo(message.chat.id, f)
+
+# Define a function to handle incoming messages
+@bot.message_handler(func=lambda message: True)
+def echo_all(message):
+    # Echo the user's message back to them
+    bot.reply_to(message, message.text)
+
+# Start the bot
+bot.polling()
